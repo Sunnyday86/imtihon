@@ -6,6 +6,8 @@ import Savat from './components/Savat'
 import Dashbord from './components/Dashbord'
 import Home from './components/Home'
 import Shop from './components/Shop'
+import { CartProvider } from './context/CartContext'
+
 const router = createBrowserRouter([
     {
         path: '/',
@@ -16,8 +18,8 @@ const router = createBrowserRouter([
                 element: <Home />
             },
             {
-path: '/shop',
-element: <Shop />
+                path: '/shop',
+                element: <Shop />
             },
             {
                 path: '/savat',
@@ -33,13 +35,11 @@ element: <Shop />
 ])
   
 
-
-
 const App = () => {
   return (
-    <div>
+    <CartProvider>
       <RouterProvider router={router} />
-    </div>
+    </CartProvider>
   )
 }
 

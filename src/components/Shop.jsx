@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
+import { CartContext } from '../context/CartContext'
 
 const categoriesList = [
   {
@@ -27,6 +28,8 @@ const categoriesList = [
 const Shop = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all");
+  const { addToCart, darkMode } = useContext(CartContext);
+  const [notification, setNotification] = useState("");
 
   useEffect(() => {
     const getProducts = async () => {
@@ -37,11 +40,27 @@ const Shop = () => {
     getProducts();
   }, [category]);
 
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    setNotification(`${product.title} savatga qo'shildi!`);
+    setTimeout(() => setNotification(""), 2000);
+  }
+
   return (
-   <div className="min-h-screen bg-[#21192b] px-[32px] py-[40px] text-[#f5f2eb]">
+   <div className={`min-h-screen px-[32px] py-[40px] ${
+     darkMode
+       ? 'bg-[#21192b] text-[#f5f2eb]'
+       : 'bg-[#f5f2eb] text-[#21192b]'
+   }`}>
+
+    {notification && (
+      <div className="fixed top-[100px] right-5 bg-[#b6ff22] text-black px-4 py-2 rounded-lg shadow-lg">
+        {notification}
+      </div>
+    )}
 
   {/* CATEGORY */}
-  <div className="flex gap-[10px]">
+  <div className="flex gap-[10px] flex-wrap">
 
     {categoriesList.map((cat) => (
       <button
@@ -50,7 +69,9 @@ const Shop = () => {
         className={`rounded-full px-[20px] py-[9px] cursor-pointer text-[16px] font-medium transition-all ${
           category === cat.slug
             ? "bg-[#b6ff22] text-black"
-            : "bg-[#30283a] text-[#f5f2eb] hover:bg-[#3a3145]"
+            : darkMode
+              ? "bg-[#30283a] text-[#f5f2eb] hover:bg-[#3a3145]"
+              : "bg-gray-300 text-[#21192b] hover:bg-gray-400"
         }`}
       >
         {cat.name}
@@ -65,10 +86,16 @@ const Shop = () => {
     {products.map((product) => (
       <div
         key={product.id}
-        className="overflow-hidden rounded-[16px] cursor-pointer bg-[#30283a] transition-all hover:-translate-y-[4px] shadow-lg"
+        className={`overflow-hidden rounded-[16px] cursor-pointer transition-all hover:-translate-y-[4px] shadow-lg ${
+          darkMode
+            ? 'bg-[#30283a]'
+            : 'bg-white border border-gray-300'
+        }`}
       >
 
-        <div className="relative w-full bg-[#1f1929] aspect-square overflow-hidden">
+        <div className={`relative w-full aspect-square overflow-hidden ${
+          darkMode ? 'bg-[#1f1929]' : 'bg-gray-200'
+        }`}>
           <img
             src={product.thumbnail}
             alt={product.title}
@@ -78,11 +105,15 @@ const Shop = () => {
 
         <div className="p-[16px]">
 
-          <p className="text-[13px] text-[#aaa1b2]">
+          <p className={`text-[13px] ${
+            darkMode ? 'text-[#aaa1b2]' : 'text-gray-600'
+          }`}>
             {product.category}
           </p>
 
-          <h2 className="mt-[8px] line-clamp-1 text-[18px] font-bold">
+          <h2 className={`mt-[8px] line-clamp-1 text-[18px] font-bold ${
+            darkMode ? 'text-[#f5f2eb]' : 'text-[#21192b]'
+          }`}>
             {product.title}
           </h2>
 
@@ -92,7 +123,10 @@ const Shop = () => {
               ${product.price}
             </p>
 
-            <button className="rounded-full bg-[#b6ff22] px-[14px] py-[7px] text-[14px] font-bold text-black">
+            <button 
+              onClick={() => handleAddToCart(product)}
+              className="rounded-full bg-[#b6ff22] px-[14px] py-[7px] text-[14px] font-bold text-black hover:bg-[#a6ef12] transition-all"
+            >
               +
             </button>
 
